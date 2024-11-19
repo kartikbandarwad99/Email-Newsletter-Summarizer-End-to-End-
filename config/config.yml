@@ -1,0 +1,70 @@
+gmail:
+  credentials:
+    credentials_file: "credentials.json"
+    token_file: "token.json"
+    scopes: 
+      - "https://www.googleapis.com/auth/gmail.readonly"
+  
+  fetch:
+    default_label: "INBOX"
+    default_date_range:
+      start_days: 7  
+      end_days: 0    
+    
+    mime_types:
+      - "text/plain"
+      - "text/html"
+    
+    max_emails: 100
+    
+    processing:
+      decode_encoding: "utf-8"
+      extract_fields:
+        - id
+        - snippet
+        - subject
+        - from
+        - body
+
+# notion:
+#   database:
+#     name: "Email Summaries"
+#     properties:
+#       From:
+#         type: "title"
+#         field_type: "text"
+#         required: true
+      
+#       Subject:
+#         type: "rich_text"
+#         field_type: "text"
+#         max_length: 2000
+#         required: true
+      
+#       Content:
+#         type: "rich_text"
+#         field_type: "text"
+#         max_length: 1500
+#         required: true
+      
+#       Links:
+#         type: "rich_text"
+#         field_type: "text"
+#         format: "url_list"
+#         required: false
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    file:
+      filename: "logs/pipeline.log"
+      max_bytes: 10485760
+      backup_count: 3
+    console:
+      enabled: true
+
+error_handling:
+  max_retries: 3
+  retry_delay: 60
+  notify_on_failure: true
