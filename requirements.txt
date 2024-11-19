@@ -1,0 +1,15 @@
+requests
+python-dotenv
+pandas
+langchain
+langchain-community
+torch
+langchain-huggingface
+langchain-openai
+langchain-google-genai
+beautifulsoup4
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+tiktoken

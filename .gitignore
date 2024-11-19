@@ -1,0 +1,8 @@
+.env
+credentials_base64.txt
+credentials.json
+token_base64.txt
+gmail_with_config.py
+trial.ipynb
+trial2.ipynb
+try.py
