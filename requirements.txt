@@ -1,9 +1,7 @@
 requests
 python-dotenv
-pandas
 langchain
 langchain-community
-torch
 langchain-huggingface
 langchain-openai
 langchain-google-genai
