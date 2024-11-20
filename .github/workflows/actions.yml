@@ -31,8 +31,8 @@ jobs:
         if [ -n "${{ secrets.google_api_key }}" ]; then  # Changed back to match the code
           echo "Google API key available"
         fi
-        if [ -n "${{ secrets.Database_id }}" ]; then
-          echo "${{ secrets.Database_id }}" | base64 --decode > Database_id
+        if [ -n "${{ secrets.page_id }}" ]; then
+          echo "${{ secrets.page_id }}" | base64 --decode > page_id
           echo "Database ID saved"
         fi
         if [ -n "${{ secrets.Notion_token }}" ]; then
@@ -42,7 +42,7 @@ jobs:
         
     - name: Verify Decoded Files
       run: |
-        declare -a files=("credentials.json" "token.json" "Database_id" "Notion_token")
+        declare -a files=("credentials.json" "token.json" "page_id" "Notion_token")
         missing_files=()
         
         for file in "${files[@]}"; do
@@ -76,8 +76,8 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: credentials.json
         google_api_key: ${{ secrets.google_api_key }}  # Changed to match os.getenv('google_api_key')
         TOKEN_FILE: token.json
-        DATABASE_ID: ${{ secrets.Database_id }}
-        NOTION_TOKEN: ${{ secrets.Notion_token }}
+        page_id: ${{ secrets.page_id }}
+        Notion_token: ${{ secrets.Notion_token }}
       run: |
         # Print environment variable check (masked)
         echo "Checking if google_api_key is set: ${{ secrets.google_api_key != '' }}"
