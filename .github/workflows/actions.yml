@@ -14,46 +14,13 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v4
-      # with:
-      #   python-version: '3.x'  # Specify the Python version
 
-    - name: Decode and save credentials.json
+    - name: Decode Secrets to Files
       run: |
-        if [ -n "${{ secrets.CREDENTIALS }}" ]; then
-          echo "${{ secrets.CREDENTIALS }}" | base64 --decode > credentials.json
-        fi
-
-    - name: Decode token.json from secret
-      run: |
-        if [ -n "${{ secrets.TOKEN_JSON }}" ]; then
-          echo "${{ secrets.TOKEN_JSON }}" | base64 --decode > token.json
-        else
-          echo "No existing token.json found."
-        fi
-
-    - name: Decode Database_id from secret
-      run: |
-        if [ -n "${{ secrets.Database_id }}" ]; then
-          echo "${{ secrets.Database_id }}" | base64 --decode > Database_id
-        fi
-
-    - name: Decode page_id from secret
-      run: |
-        if [ -n "${{ secrets.page_id }}" ]; then
-          echo "${{ secrets.page_id }}" | base64 --decode > page_id
-        fi
-
-    - name: Decode Notion_token from secret
-      run: |
-        if [ -n "${{ secrets.Notion_token }}" ]; then
-          echo "${{ secrets.Notion_token }}" | base64 --decode > Notion_token
-        fi
-
-    - name: Decode google_api_key from secret
-      run: |
-        if [ -n "${{ secrets.google_api_key }}" ]; then
-          echo "${{ secrets.google_api_key }}" | base64 --decode > google_api_key
-        fi
+        echo "${{ secrets.google_api_key }}" | base64 --decode > google_api_key
+        echo "${{ secrets.page_id }}" | base64 --decode > page_id
+        echo "${{ secrets.Notion_token }}" | base64 --decode > Notion_token
+        echo "${{ secrets.Database_id }}" | base64 --decode > Database_id
 
     - name: Install dependencies
       run: |
@@ -66,12 +33,11 @@ jobs:
     - name: Run main.py
       env:
         GOOGLE_APPLICATION_CREDENTIALS: credentials.json
-        google_api_key: ${{ secrets.google_api_key }}
-        page_id: ${{ secrets.page_id }}
-        Notion_token: ${{ secrets.Notion_token }}
-        Database_id: ${{ secrets.Database_id }}
+        google_api_key: $(cat google_api_key)
+        page_id: $(cat page_id)
+        Notion_token: $(cat Notion_token)
+        Database_id: $(cat Database_id)
       run: |
-        # Add retry mechanism
         for i in 1 2 3; do
           if python -m scripts.main; then
             exit 0
@@ -79,6 +45,7 @@ jobs:
           echo "Attempt $i failed. Retrying..."
           sleep 5
         done
+        echo "Script failed after 3 attempts."
         exit 1
 
     - name: Encode token.json and update secret
@@ -93,8 +60,6 @@ jobs:
                -H "Accept: application/vnd.github.v3+json" \
                https://api.github.com/repos/$REPO_NAME/actions/secrets/TOKEN_JSON \
                -d "{\"encrypted_value\":\"$TOKEN_JSON_BASE64\"}"
-        else
-          echo "token.json not found, skipping update."
         fi
 
     - name: Clean up sensitive files
@@ -104,10 +69,9 @@ jobs:
 
     - name: Upload logs on failure
       if: failure()
-      uses: actions/upload-artifact@v3    # Updated from v2 to v3
+      uses: actions/upload-artifact@v3
       with:
         name: debug-logs
         path: |
           *.log
           error.txt
-        # retention-days: 5    # Optional: specify how long to keep the logs
