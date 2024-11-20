@@ -30,20 +30,32 @@ jobs:
           echo "${{ secrets.google_api_key }}" | base64 --decode > google_api_key
         fi
         if [ -n "${{ secrets.Database_id }}" ]; then
-          echo "${{ secrets.Database_id }}" | base64 --decode > database_id
+          echo "${{ secrets.Database_id }}" | base64 --decode > Database_id  # Changed from database_id to Database_id
         fi
         if [ -n "${{ secrets.Notion_token }}" ]; then
-          echo "${{ secrets.Notion_token }}" | base64 --decode > notion_token
+          echo "${{ secrets.Notion_token }}" | base64 --decode > Notion_token  # Changed from notion_token to Notion_token
         fi
         
     - name: Verify Decoded Files
       run: |
-        for file in credentials.json token.json google_api_key database_id notion_token; do
+        declare -a files=("credentials.json" "token.json" "google_api_key" "Database_id" "Notion_token")
+        missing_files=()
+        
+        for file in "${files[@]}"; do
           if [ ! -f "$file" ]; then
-            echo "Error: $file not found!"
-            exit 1
+            missing_files+=("$file")
+            echo "Warning: $file not found!"
+          else
+            echo "$file exists"
           fi
         done
+        
+        if [ ${#missing_files[@]} -ne 0 ]; then
+          echo "Error: The following files are missing:"
+          printf '%s\n' "${missing_files[@]}"
+          exit 1
+        fi
+        
         echo "All necessary files exist."
         
     - name: Install Dependencies
@@ -58,10 +70,10 @@ jobs:
     - name: Run main.py
       env:
         GOOGLE_APPLICATION_CREDENTIALS: credentials.json
-        GOOGLE_API_KEY: ${{ secrets.google_api_key }}  # Use secret directly instead of file content
+        GOOGLE_API_KEY: ${{ secrets.google_api_key }}
         TOKEN_FILE: token.json
-        DATABASE_ID: ${{ secrets.Database_id }}  # Use secret directly instead of file content
-        NOTION_TOKEN: ${{ secrets.Notion_token }}  # Use secret directly instead of file content
+        DATABASE_ID: ${{ secrets.Database_id }}
+        NOTION_TOKEN: ${{ secrets.Notion_token }}
       run: |
         for attempt in {1..3}; do
           if python -m scripts.main; then
@@ -75,9 +87,9 @@ jobs:
         exit 1
         
     - name: Clean Up Sensitive Files
-      if: always()  # Ensure cleanup happens even if previous steps fail
+      if: always()
       run: |
-        rm -f credentials.json token.json google_api_key database_id notion_token
+        rm -f credentials.json token.json google_api_key Database_id Notion_token
         
     - name: Upload Logs on Failure
       if: failure()
@@ -87,4 +99,4 @@ jobs:
         path: |
           *.log
           error.txt
-        retention-days: 5  # Added retention period
+        retention-days: 5
