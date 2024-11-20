@@ -63,4 +63,7 @@ if __name__ == '__main__':
     title = f'Newsletters from: {start_date} to {end_date}'
     [print(len(mail['summary'])) for mail in cleaned_mails]
     database_id = create_database(page_id=page_id,headers=headers,title = title)
+    print(f'database_id: {database_id}')
+    print(f'page_id: {page_id}')
+    print(f'Notion_token: {Notion_token}')
     add_to_database(headers=headers,database_id=database_id,email_list=cleaned_mails)
