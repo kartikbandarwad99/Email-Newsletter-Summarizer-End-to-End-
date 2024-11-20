@@ -112,8 +112,7 @@ The workflow defined in `.github/workflows/actions.yml` performs the following:
 
 If you have any thoughts, suggestions, or run into issues, feel free to:
 
-- Open an [issue](https://github.com/your-repo/issues) to share your feedback or report bugs.
-- Reach out to me directly at [your-email@example.com].
+- Reach out to me directly at [kbandarwad@gmail.com].
 
 Your input is greatly appreciated and helps me make this project even better. Thank you! 😊
 
