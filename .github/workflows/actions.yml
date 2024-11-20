@@ -1,4 +1,5 @@
 name: Scheduled Job
+
 on:
   schedule:
     - cron: '0 0 */7 * *'  # Run every 7 days
@@ -7,7 +8,7 @@ on:
 jobs:
   run_main_script:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 20  # Set a reasonable timeout
     
     steps:
     - name: Checkout repository
@@ -18,30 +19,32 @@ jobs:
       with:
         python-version: '3.9'
         
-    - name: Decode and Save Credentials
+    - name: Decode and Save Secrets
       run: |
         if [ -n "${{ secrets.CREDENTIALS }}" ]; then
           echo "${{ secrets.CREDENTIALS }}" | base64 --decode > credentials.json
-          echo "Credentials saved"
-        fi
-        if [ -n "${{ secrets.TOKEN_JSON }}" ]; then
-          echo "${{ secrets.TOKEN_JSON }}" | base64 --decode > token.json
-          echo "Token saved"
-        fi
-        if [ -n "${{ secrets.google_api_key }}" ]; then  # Changed back to match the code
-          echo "Google API key available"
-        fi
-        if [ -n "${{ secrets.page_id }}" ]; then
-          echo "${{ secrets.page_id }}" | base64 --decode > page_id
-          echo "Database ID saved"
-        fi
-        if [ -n "${{ secrets.Notion_token }}" ]; then
-          echo "Notion token available"
+          echo "Decoded: credentials.json"
+        else
+          echo "Warning: CREDENTIALS secret is missing or empty!"
         fi
         
+        if [ -n "${{ secrets.TOKEN_JSON }}" ]; then
+          echo "${{ secrets.TOKEN_JSON }}" | base64 --decode > token.json
+          echo "Decoded: token.json"
+        else
+          echo "Warning: TOKEN_JSON secret is missing or empty!"
+        fi
+        
+        if [ -n "${{ secrets.page_id }}" ]; then
+          echo "${{ secrets.page_id }}" | base64 --decode > page_id
+          echo "Decoded: page_id"
+        else
+          echo "Warning: page_id secret is missing or empty!"
+        fi
+
     - name: Verify Decoded Files
       run: |
-        declare -a files=("credentials.json" "token.json" "page_id" "Notion_token")
+        declare -a files=("credentials.json" "token.json" "page_id")
         missing_files=()
         
         for file in "${files[@]}"; do
@@ -49,7 +52,7 @@ jobs:
             missing_files+=("$file")
             echo "Warning: $file not found!"
           else
-            echo "$file exists"
+            echo "$file exists."
           fi
         done
         
@@ -73,13 +76,12 @@ jobs:
     - name: Run main.py
       env:
         GOOGLE_APPLICATION_CREDENTIALS: credentials.json
-        google_api_key: ${{ secrets.google_api_key }}  # Changed to match os.getenv('google_api_key')
+        google_api_key: ${{ secrets.google_api_key }}
         TOKEN_FILE: token.json
-        page_id: ${{ secrets.page_id }}
+        page_id: $(cat page_id)
         Notion_token: ${{ secrets.Notion_token }}
       run: |
-        # Print environment variable check (masked)
-        # echo "Checking if google_api_key is set: ${{ secrets.google_api_key != '' }}"
+        echo "Running main.py..."
         
         for attempt in {1..3}; do
           if python -m scripts.main; then
@@ -95,7 +97,7 @@ jobs:
     - name: Clean Up Sensitive Files
       if: always()
       run: |
-        rm -f credentials.json token.json Database_id Notion_token
+        rm -f credentials.json token.json page_id
         
     - name: Upload Logs on Failure
       if: failure()
