@@ -34,17 +34,10 @@ jobs:
         else
           echo "Warning: TOKEN_JSON secret is missing or empty!"
         fi
-        
-        if [ -n "${{ secrets.page_id }}" ]; then
-          echo "${{ secrets.page_id }}" | base64 --decode > page_id
-          echo "Decoded: page_id"
-        else
-          echo "Warning: page_id secret is missing or empty!"
-        fi
 
     - name: Verify Decoded Files
       run: |
-        declare -a files=("credentials.json" "token.json" "page_id")
+        declare -a files=("credentials.json" "token.json")
         missing_files=()
         
         for file in "${files[@]}"; do
@@ -78,7 +71,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: credentials.json
         google_api_key: ${{ secrets.google_api_key }}
         TOKEN_FILE: token.json
-        page_id: $(cat page_id)
+        page_id: ${{ secrets.page_id }}
         Notion_token: ${{ secrets.Notion_token }}
       run: |
         echo "Running main.py..."
@@ -97,7 +90,7 @@ jobs:
     - name: Clean Up Sensitive Files
       if: always()
       run: |
-        rm -f credentials.json token.json page_id
+        rm -f credentials.json token.json
         
     - name: Upload Logs on Failure
       if: failure()
