@@ -36,8 +36,7 @@ jobs:
           echo "Database ID saved"
         fi
         if [ -n "${{ secrets.Notion_token }}" ]; then
-          echo "${{ secrets.Notion_token }}" | base64 --decode > Notion_token
-          echo "Notion token saved"
+          echo "Notion token available"
         fi
         
     - name: Verify Decoded Files
