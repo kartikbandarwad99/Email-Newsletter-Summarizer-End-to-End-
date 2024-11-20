@@ -1,4 +1,5 @@
 name: Scheduled Job
+
 on:
   schedule:
     - cron: '0 0 */7 * *'  # Run every 7 days
@@ -8,6 +9,7 @@ jobs:
   run_main_script:
     runs-on: ubuntu-latest
     timeout-minutes: 30    # Add timeout limit
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
