@@ -29,8 +29,8 @@ jobs:
         if [ -n "${{ secrets.google_api_key }}" ]; then
           echo "${{ secrets.google_api_key }}" | base64 --decode > google_api_key
         fi
-        if [ -n "${{ secrets.Database_id }}" ]; then
-          echo "${{ secrets.Database_id }}" | base64 --decode > Database_id  # Changed from database_id to Database_id
+        if [ -n "${{ secrets.page_id }}" ]; then
+          echo "${{ secrets.page_id }}" | base64 --decode > page_id
         fi
         if [ -n "${{ secrets.Notion_token }}" ]; then
           echo "${{ secrets.Notion_token }}" | base64 --decode > Notion_token  # Changed from notion_token to Notion_token
@@ -38,7 +38,7 @@ jobs:
         
     - name: Verify Decoded Files
       run: |
-        declare -a files=("credentials.json" "token.json" "google_api_key" "Database_id" "Notion_token")
+        declare -a files=("credentials.json" "token.json" "google_api_key" "page_id" "Notion_token")
         missing_files=()
         
         for file in "${files[@]}"; do
