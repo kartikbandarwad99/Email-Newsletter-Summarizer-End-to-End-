@@ -15,7 +15,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       # with:
-        # python-version: '3.x'  # Specify the Python version
+      #   python-version: '3.x'  # Specify the Python version
 
     - name: Decode and save credentials.json
       run: |
@@ -57,7 +57,6 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then
           pip install -r requirements.txt
         else
@@ -70,7 +69,7 @@ jobs:
         google_api_key: ${{ secrets.google_api_key }}
         page_id: ${{ secrets.page_id }}
         Notion_token: ${{ secrets.Notion_token }}
-        Database_id: ${{ secrets.Database_id }}  # Added Database_id to env
+        Database_id: ${{ secrets.Database_id }}
       run: |
         # Add retry mechanism
         for i in 1 2 3; do
@@ -83,7 +82,7 @@ jobs:
         exit 1
 
     - name: Encode token.json and update secret
-      if: success()  # Only run if previous steps succeeded
+      if: success()
       env:
         GH_PAT: ${{ secrets.GH_PAT }}
         REPO_NAME: ${{ github.repository }}
@@ -105,9 +104,10 @@ jobs:
 
     - name: Upload logs on failure
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3    # Updated from v2 to v3
       with:
         name: debug-logs
         path: |
           *.log
           error.txt
+        # retention-days: 5    # Optional: specify how long to keep the logs
